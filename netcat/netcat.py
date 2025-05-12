@@ -20,16 +20,16 @@ class NetCat:
             self.send()
 
     def send(self):
-        self.client.connect((self.args.target, self.args.port))
+        self.socket.connect((self.args.target, self.args.port))
         if self.buffer:
-            self.client.send(self.buffer)
+            self.socket.send(self.buffer)
 
         try:
             while True:
                 recv_len = 1
                 response = ''
                 while recv_len:
-                    data = self.client.recv(4096)
+                    data = self.socket.recv(4096)
                     recv_len = len(data)
                     response += data.decode()
                     if recv_len < 4096:
@@ -40,10 +40,10 @@ class NetCat:
 
                 buffer = input('> ')
                 buffer += '\n'
-                self.client.send(buffer.encode())
+                self.socket.send(buffer.encode())
         except KeyboardInterrupt:
             print('User terminated the program.')
-            self.client.close()
+            self.socket.close()
             sys.exit()
 
     def listen(self):
@@ -110,12 +110,12 @@ if __name__ == '__main__':
                                netcat.py -t 192.168.1.108 -p 5555 # 連線到伺服器
                                ''')
     )
-    parser.add_argument('-t', '--target', type=str, default=None, help='目標主機')
-    parser.add_argument('-p', '--port', type=int, default=None, help='目標埠號')
+    parser.add_argument('-t', '--target', default='192.168.110.133', help='目標主機')
+    parser.add_argument('-p', '--port', type=int, default=5555, help='目標埠號')
     parser.add_argument('-l', '--listen', action='store_true', help='監聽模式')
     parser.add_argument('-c', '--command', action='store_true', help='命令 shell 模式')
-    parser.add_argument('-u', '--upload', type=str, default=None, help='上傳檔案')
-    parser.add_argument('-e', '--execute', type=str, default=None, help='執行命令')
+    parser.add_argument('-u', '--upload' , default=None, help='上傳檔案')
+    parser.add_argument('-e', '--execute', help='執行命令')
     args = parser.parse_args()
     if args.listen:
         buffer = ''
